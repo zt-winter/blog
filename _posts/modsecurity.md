@@ -26,11 +26,11 @@ wget https://github.com/digininja/DVWA/archive/master.zip
 unzip master.zip -d dvwa
 mv dvwa /usr/local/nginx/html
 sudo pacman -S apache php php-apache mariadb php-gd php-sqlite
-#启动apache服务
+# 启动apache服务
 systemctl enable httpd
 systemctl start httpd
 sudo mariadb-install-db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
-#安装mariadb数据库
+# 安装mariadb数据库
 systemctl enable mariadb
 systemctl start mariadb
 sudo mysql_secure_installation
@@ -46,4 +46,28 @@ sudo vim /etc/httpd/conf/httpd.conf
 # dvwa的配置文件，修改用户、密码、IP端口、防护级别等
 sudo vim /usr/local/nginx/html/dvwa/config/config.inc.php
 ```
-
+nginx配置文件
+```conf
+server {
+    #监控本地80端口
+	listen 80;
+	server_name localhost;
+	modsecurity on;
+    #加载核心规则集启动配置
+	modsecurity_rules_file /usr/local/nginx/conf/modsec/crs-setup.conf;
+    #加载配置文件
+	modsecurity_rules_file /usr/local/nginx/conf/modsec/modsecurity.conf;
+	modsecurity_rules_file /usr/local/nginx/conf/modsec/modsecurity-crs.conf;
+	#nginx加载modsecurity不支持使用通配符匹配多个文件
+	#modsecurity_rules_file /usr/local/nginx/conf/modsec/crs/rules/*.conf;
+    #设置代理
+	location / {
+		proxy_pass http://localhost:8080;
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+		proxy_set_header ModSecurity-enabled "1";
+	}
+}
+```

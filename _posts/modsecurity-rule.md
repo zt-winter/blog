@@ -20,3 +20,17 @@ SecRule VARIABLES OPERATOR [ACTIONS]
 
 # coreruleset实例
 [coreruleset](https://github.com/coreruleset/coreruleset)是modsecurity官方给出的一些规则集，其中有一些针对特定攻击或探测的规则，可供参考。
+导入corerulest时，其中会有一个crs-setup.conf文件，该文件命令了一个通用变量集，在规则集中会引用这些变量，从而实现所有规则集的变量控制。
+```conf
+SecAction \
+  "id:900990,\
+  phase:1,\
+  pass,\
+  t:none,\
+  nolog,\
+  tag:'OWASP_CRS',\
+  ver:'OWASP_CRS/4.14.0-dev',\
+  setvar:tx.crs_setup_version=4140,\
+  setvar:tx.detection_paranoia_level=1"
+```
+setvar:XXX就设置了变量，后续在coreruleset识别扫描的规则集中会获取该变量，并做出不同的探测级别设置，比如REQUEST-913-SCANNER-DETECTION.conf中`SecRule TX:DETECTION_PARANOIA_LEVEL "@lt 1" "id:913011"`，会判断TX:DETECTION_PARANOIA_LEVEL是否小于1。在crs-setup.conf文件中会对通用变量的含义有详细解释。
