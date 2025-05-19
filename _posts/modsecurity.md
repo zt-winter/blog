@@ -9,13 +9,16 @@ categories: security
 # modsecurity+nginx+dvwa安装配置
 下载nginx与modsecurity
 ```bash
+# 下载modsecurity并安装
+git clone git@github.com:owasp-modsecurity/ModSecurity.git
+
 # 下载nginx和modsecurity的nginx插件
 wget http://nginx.org/download/nginx-1.26.1.tar.gz
 tar -zxvf nginx-1.26.1.tar.gz
 git clone https://github.com/SpiderLabs/ModSecurity-nginx
 cd nginx-1.26.1
 # 编译安装
-./configure --add-module=../Modsecurity-nginx
+./configure --add-module=../Modsecurity-nginx --with-http_ssl_module
 make -j 8
 sudo make install 
 ```
@@ -45,7 +48,31 @@ sudo vim /etc/php/php-fpm.d/www.conf
 sudo vim /etc/httpd/conf/httpd.conf
 # dvwa的配置文件，修改用户、密码、IP端口、防护级别等
 sudo vim /usr/local/nginx/html/dvwa/config/config.inc.php
+
+#apache服务在启动时会在/var/run/中创建文件夹，可以在启动服务中添加创建目录命令，避免找不到目录和文件
+vim /usr/lib/systemd/system/php8.4-fpm.service
+[Service]
+ExecStartPre=/bin/install -d /var/run/php-fpm -o root -g root -m 751 
 ```
+modsecurity规则文件整合及配置
+```bash
+mkdir /usr/local/nginx/conf/modsec
+git clone git@github.com:coreruleset/coreruleset.git
+cd coreruleset/rules
+cat *.conf >> modsecurity-crs.conf
+cp * /usr/local/nginx/conf/modsec/
+
+cd ModSecurity
+cp modsecurity.conf-recommanded /usr/local/nginx/conf/modsec/
+cd coreruleset
+cp crs-setup.conf.example /usr/local/nginx/conf/modsec/
+cd /usr/local/nginx/conf/modsec
+mv modsecurity.conf-recommanded modsecurity.conf
+mv crs-setup.conf.example crs-setup.conf
+```
+
+
+
 nginx配置文件
 ```conf
 server {
