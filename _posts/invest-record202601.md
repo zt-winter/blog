@@ -1,9 +1,10 @@
 title: 投资记录（20260206）
-tag:
+tags:
     - investment
     - stock
 date: 2026/02/07
 categories: investment
+---
 
 # 投资总体情况
 场内基金收益率9.59%，当前仓位为28.6%。仓位分布红利、消费、标普500、标普油气、创新药。

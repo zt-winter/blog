@@ -1,9 +1,10 @@
 title: 投资记录（20260329）
-tag:
+tags:
 	- investment
 	- stock
 date: 2026/03/29
-categoreis: investment
+categories: investment
+---
 
 # 投资总体情况
 场内基金收益率8.6%，当前仓位为40.92%。仓位分布在红利、消费、标普500、创新药、互联网、养殖。  
